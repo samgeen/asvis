@@ -200,7 +200,7 @@ class ColourShader(object):
             self._logmin = dmin
             self._invlogrng = invrng
             self._recalcMaxMin = 10
-            print self._logmin, self._invlogrng
+            #print self._logmin, self._invlogrng
             #del(data)
         # HACK
         #data = glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT)

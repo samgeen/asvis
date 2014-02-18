@@ -104,11 +104,11 @@ class AsVis(Level.Level):
         #if button == pyglet.window.key.ESCAPE:
             # Upon returning the window will now quit too
         # Q
-        if button == 113 and pressed:
+        if button == pyglet.window.key.Q and pressed:
             self._renderer.Camera().ZoomIn()
             self.Redraw()
         # E
-        if button == 101 and pressed:
+        if button == pyglet.window.key.E and pressed:
             self._renderer.Camera().ZoomOut()
             self.Redraw()
         # Switch render modes
@@ -122,5 +122,6 @@ class AsVis(Level.Level):
 if __name__ == '__main__':
     # NOTE - this will run the visualiser immediately
     asvis = AsVis()
-    asvis.LoadSnapshot("/data/Simulations/Disk/Runs/lvl10/output_00016")
+    asvis.LoadSnapshot("output_00016")
     asvis.Run()
+

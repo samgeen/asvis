@@ -43,11 +43,11 @@ class Snapshot(object):
         '''
         self._filename = filename
         # Read data from filename
-        try:
-            points, sizes, pointmass = self._LoadNewData(filename)
-        except:
-            print "Open failed; returning..."
-            return
+        #try:
+        points, sizes, pointmass = self._LoadNewData(filename)
+        #except:
+        #    print "Open failed; returning..."
+        #    return
         # Make drawable point cloud object
         if not self._cloud is None:
             del self._cloud
