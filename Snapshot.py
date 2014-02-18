@@ -105,7 +105,7 @@ class Snapshot(object):
             smooth = smooth[lim]
             mass = mass[lim]
         # Process lengths to fit screen
-        rescalepoints = False
+        rescalepoints = True
         if rescalepoints:
             pmin, pmax = (np.min(posns),np.max(posns))
             posns = (posns - pmin) / (pmax - pmin)
@@ -120,12 +120,12 @@ class Snapshot(object):
             cheap = fluid["pos"].units
             posns /= cheap
             smooth /= cheap
-        posns /= ro._info["boxlen"]
-        smooth /= ro._info["boxlen"]
+        #posns /= ro._info["boxlen"]
+        #smooth /= ro._info["boxlen"]
         posns -= 0.5
         #posns -= np.sum(posns,0)/len(posns)
-        self._outnum = self._FindOutNum(filename)
-        self._time = ro._info["time"]
+        self._outnum = 0#self._FindOutNum(filename)
+        self._time = 0.0#ro._info["time"]
         self._snapdata = ro
         print "DONE LOADING DATA"
         return posns, smooth, mass

@@ -122,6 +122,6 @@ class AsVis(Level.Level):
 if __name__ == '__main__':
     # NOTE - this will run the visualiser immediately
     asvis = AsVis()
-    asvis.LoadSnapshot("output_00016")
+    asvis.LoadSnapshot("/data/Simulations/GadgetTest/spiral68_010")
     asvis.Run()
 
