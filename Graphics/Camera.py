@@ -10,6 +10,8 @@ import pyglet
 from pyglet.gl import *
 from pyglet.gl.glu import *
 
+import numpy as np
+
 #import EventHandler as Events
 #from MouseHandler import MouseHandler
 import math
@@ -36,7 +38,13 @@ class Camera(object):
         self.__right = Vect3(1.0,0.0,0.0) # This is reset during the view calculations
         self.__xangle = 0.0
         self.__yangle = 0.0
-        self.__zoomSpeed = 1.01
+        self.__zoomSpeed = 1.30
+        # Keep track of time for smooth moving of camera
+        self._clock = pyglet.clock.Clock()
+        self._time = self._clock.time()
+        self._prevtime = self._time
+        self._zoomIn = False
+        self._zoomOut = False
         ' Events '
         #self.__inputHandler = MouseHandler()
         #self.__inputHandler.RegisterEvents()
@@ -113,23 +121,20 @@ class Camera(object):
             self._RecalculatePosition()
         return self.__zoom
             
-    def ZoomIn(self):
+    def ZoomIn(self, on=True):
         '''
         Zoom in camera
         '''
-        self.__zoom /= self.__zoomSpeed
-        self.__position /= self.__zoomSpeed
-        self._RecalculatePosition()
+        self._zoomIn = on
         
-    def ZoomOut(self):
+    def ZoomOut(self, on=True):
         '''
         Zoom in camera
         '''
-        self.__zoom *= self.__zoomSpeed
-        self.__position *= self.__zoomSpeed
-        self._RecalculatePosition()
+        self._zoomOut = on
     
     def _RecalculatePosition(self):
+        
         #self.__position[0] = self.__zoom*math.cos(self.__xangle) * math.sin(self.__yangle)
         #self.__position[1] = self.__zoom*math.sin(self.__xangle) * math.sin(self.__yangle)
         #self.__position[2] = self.__zoom*math.cos(self.__yangle)
@@ -141,7 +146,10 @@ class Camera(object):
         '''
         Update the display with the current camera view
         '''
-        
+        self._prevtime = self._time
+        self._time = self._clock.time()
+        dt = self._time - self._prevtime
+        self._CalcZoom(dt)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         gluPerspective(45,1.0,0.0001,10.0)
@@ -171,3 +179,16 @@ class Camera(object):
         Give direction of up
         '''
         self.__up = direction
+        
+    def _CalcZoom(self, dt):
+        # The zoom is a logarithmic zoom, i.e. zooms by factors of 10 in constant time
+        zoomfact = self.__zoomSpeed ** dt
+        if self._zoomIn:
+            self.__zoom /= zoomfact
+            self.__position /= zoomfact
+        if self._zoomOut:
+            self.__zoom *= zoomfact
+            self.__position *= zoomfact
+        print self.__zoom, dt
+        if self._zoomIn or self._zoomOut:   
+            self._RecalculatePosition()

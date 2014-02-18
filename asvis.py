@@ -104,16 +104,18 @@ class AsVis(Level.Level):
         #if button == pyglet.window.key.ESCAPE:
             # Upon returning the window will now quit too
         # Q
-        if button == pyglet.window.key.Q and pressed:
-            self._renderer.Camera().ZoomIn()
+        if button == pyglet.window.key.Q:
+            self._renderer.Camera().ZoomIn(pressed)
             self.Redraw()
         # E
-        if button == pyglet.window.key.E and pressed:
-            self._renderer.Camera().ZoomOut()
+        if button == pyglet.window.key.E:
+            self._renderer.Camera().ZoomOut(pressed)
             self.Redraw()
+            
         # Switch render modes
-        if button == pyglet.window.key.P and not pressed:
-            self._renderer.ToggleBillboarding()
+        # TODO: Unbreak this
+        #if button == pyglet.window.key.P and not pressed:
+        #    self._renderer.ToggleBillboarding()
         
     def OnMouseButton(self, state):
         if state["button"] % 2 == pyglet.window.mouse.LEFT:
