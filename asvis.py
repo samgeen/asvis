@@ -37,6 +37,7 @@ class AsVis(Level.Level):
         Level.Level.__init__(self)
         self._renderer = None
         self._snapshot = Snapshot()
+        self._camera = Camera()
         self._setup = False
         self._lmb = False
         # Make the game window
@@ -50,6 +51,7 @@ class AsVis(Level.Level):
             
         # Set up visualising screen
         gWindow.ChangeLevel(self)
+        pyglet.clock.schedule_interval(self.Draw, 0.1)
         
     def Run(self):
         '''
@@ -64,7 +66,7 @@ class AsVis(Level.Level):
         glEnable(GL_DEPTH_TEST)
         if not self._setup:
             # This starts threads and stuff, so don't grunk up anything by 
-            self._renderer = Renderer(self.Window(), Camera())
+            self._renderer = Renderer(self.Window(), self._camera)
             self._renderer.Setup()
             self._setup = True
     
@@ -76,8 +78,11 @@ class AsVis(Level.Level):
         self._renderer.LogText(self._snapshot.InfoText())
         self._renderer.Redraw()
             
-    def Draw(self):
+    def Draw(self, dummy=None):
+        if self._camera.ZoomActive():
+            self._renderer.Redraw()
         self._renderer.Draw([self._snapshot])
+        #if self._camera.ZoomActive():
         
     def Redraw(self):
         self._renderer.Redraw()
@@ -106,11 +111,9 @@ class AsVis(Level.Level):
         # Q
         if button == pyglet.window.key.Q:
             self._renderer.Camera().ZoomIn(pressed)
-            self.Redraw()
         # E
         if button == pyglet.window.key.E:
             self._renderer.Camera().ZoomOut(pressed)
-            self.Redraw()
             
         # Switch render modes
         # TODO: Unbreak this
@@ -124,6 +127,6 @@ class AsVis(Level.Level):
 if __name__ == '__main__':
     # NOTE - this will run the visualiser immediately
     asvis = AsVis()
-    asvis.LoadSnapshot("/data/Simulations/GadgetTest/spiral68_010")
+    asvis.LoadSnapshot("spiral68_010")
     asvis.Run()
 

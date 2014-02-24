@@ -120,6 +120,12 @@ class Camera(object):
             self.__zoom = zoom
             self._RecalculatePosition()
         return self.__zoom
+    
+    def ZoomActive(self):
+        '''
+        HACK - Is the zoom currently active?
+        '''
+        return self._zoomIn or self._zoomOut
             
     def ZoomIn(self, on=True):
         '''
@@ -189,6 +195,6 @@ class Camera(object):
         if self._zoomOut:
             self.__zoom *= zoomfact
             self.__position *= zoomfact
-        print self.__zoom, dt
-        if self._zoomIn or self._zoomOut:   
-            self._RecalculatePosition()
+        #print self.__zoom, dt
+        #if self._zoomIn or self._zoomOut:   
+        self._RecalculatePosition()

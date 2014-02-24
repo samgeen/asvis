@@ -78,7 +78,6 @@ class Window(pyglet.window.Window):
 
         dtime = self._clock.time() - self._time 
         self._time += dtime
-        
         self._level.Draw()
         
     def on_key_press(self, symbol, modifiers):  
