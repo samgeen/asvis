@@ -135,7 +135,7 @@ class OctreeCell(object):
         self._children = 0
         # Data stored inside cell of type AbstractTreeData
         self._data = data.copy()
-        # Level of refinement (top = 0)
+        # Frame of refinement (top = 0)
         self._level = level
         # Next item
         # NOTE: This is typically set in method _MakeNexts

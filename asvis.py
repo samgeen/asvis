@@ -11,30 +11,34 @@ import random
 import numpy as np
 
 from Window import Window
-import Level, zsprite
+import zsprite
+import Frame
 
 from Snapshot import Snapshot
 from Renderer import Renderer
-from Graphics.Camera import Camera
+import Camera
 from Graphics.ColourShader import ColourShader
+
+
+
+
+# REMOVE EVERYTHING BELOW HERE
 
 smallfont = pyglet.font.load("Courier New", 14)
 white = color=(1.0,1.0,1.0,1.0)
 red   = color=(1.0,0.0,0.0,1.0)
 black = color=(0.0,0.0,0.0,1.0)
 
-screenSize = (1800,1024)
-
-class AsVis(Level.Level):
+class AsVis(Frame.Frame):
     '''
-    The main display layout; used to position renderer views and pass simulation data to them
+    The top level object for visualising astrophysics 
     '''
 
-    def __init__(self):
+    def __init__(self, window=None):
         '''
         Constructor
         '''
-        Level.Level.__init__(self)
+        Frame.Frame.__init__(self)
         self._renderer = None
         self._snapshot = Snapshot()
         self._camera = Camera()
@@ -43,15 +47,17 @@ class AsVis(Level.Level):
         # Make the game window
         title = "Astrophysics Visualisation"
         windowed = True
-        config = pyglet.gl.Config(double_buffer=True)
-        if windowed:
-            gWindow = Window(screenSize[0], screenSize[1],caption = title,config=config)
-        else:
-            gWindow = Window(caption = title,fullscreen=True,config=config)
-            
-        # Set up visualising screen
-        gWindow.ChangeLevel(self)
-        pyglet.clock.schedule_interval(self.Draw, 0.1)
+        
+        screenSize = (1800,1024)
+        if window == None:
+            window = pyglet.window.Window(screenSize[0], screenSize[1],caption = title)
+        self._window = window
+        
+    def Window(self):
+        '''
+        Return the pyglet window object used by the visualiser
+        '''
+        return self._window
         
     def Run(self):
         '''

@@ -6,7 +6,7 @@ Created on 18 Aug 2011
 
 import numpy as np
 from OpenGL.GL import *
-from Camera import Camera
+import Camera
 from Maths.Vect3 import Vect3
 
 class Viewport(object):

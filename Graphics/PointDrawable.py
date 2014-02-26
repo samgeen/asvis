@@ -49,7 +49,7 @@ class PointDrawable(object):
         glColor4f(1.,1.,1.,0.01)
         for cell in self._tree:
             # Hacky colour setting!!!
-            #i = cell.Level()
+            #i = cell.Frame()
             #r = ar[i%8]
             #b = ab[i%8]
             #g = ag[i%8]

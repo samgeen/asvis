@@ -24,11 +24,11 @@ def Redraw():
 
 class UserInputHandler(object):
     '''
-    Handles user input from mouse and keyboard
+    Handles user input from mouse and keyboard and passes it to a specified handler object
     '''
-    def __init__(self, level):
+    def __init__(self, handler):
         # Use pyglet's inbuilt key state handler (NOTE - MIGHT NOT BE ABLE TO USE MODIFIER KEYS LIKE THIS)
-        self._level = level
+        self._handler = handler
         dispatcher.push_handlers(self)
         
     def __del__(self):
@@ -37,28 +37,28 @@ class UserInputHandler(object):
     
     def on_mouse_press(self, x, y, button, modifiers):
         press = {"pos": (x,y), "button":button, "mod": modifiers, "pressed":True}
-        self._level.OnMouseButton(press)
+        self._handler.OnMouseButton(press)
 
     def on_mouse_release(self, x, y, button, modifiers):
         release = {"pos": (x,y), "button":button, "mod": modifiers, "pressed":False}
-        self._level.OnMouseButton(release)
+        self._handler.OnMouseButton(release)
 
     # NOTE: Functions drag and move merged to make things easier
     def on_mouse_motion(self, x, y, dx, dy):
         motion = {"pos": (x,y), "diff": (dx, dy), "buttons":0, "mod":0}
-        self._level.OnMouseMove(motion)
+        self._handler.OnMouseMove(motion)
         
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         motion = {"pos": (x,y), "diff": (dx, dy), "buttons":buttons, "mod":modifiers}
-        self._level.OnMouseMove(motion)
+        self._handler.OnMouseMove(motion)
         
     def on_key_press(self, button, modifiers):
         press = {"button":button, "mod": modifiers, "pressed":True}
-        self._level.OnKeyboard(press)
+        self._handler.OnKeyboard(press)
 
     def on_key_release(self, button, modifiers):
         release = {"button":button, "mod": modifiers, "pressed":False}
-        self._level.OnKeyboard(release)
+        self._handler.OnKeyboard(release)
     
     def on_redraw(self):
         # Try to redraw if the level has such a functionality. If not, ignore.

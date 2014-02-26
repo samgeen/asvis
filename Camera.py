@@ -21,12 +21,50 @@ from Maths.Quaternion import Rotation
 
 import Events
 
+class CameraController(object):
+    def __init__(self, camera, window):
+        self._lmb = False
+        self._camera = camera
+        self._userInput = Events.UserInputHandler(self)
+        self._window.push_handlers(self._userInput)
+        
+    def OnMouseMove(self, state):
+        '''
+        Parse mouse movement
+        '''
+        if self._lmb:
+            self._camera.OnMouseMove(state)
+        Events.Redraw()
+
+    def OnKeyboard(self, state):
+        '''
+        Register the pressing or releasing of a keyboard key
+        This can be overridden by the concrete class if desired, or left inactive
+        state - a dictionary of the mouse state:
+                   {"button": button, "mod": modifier keys used, "pressed":True or False}
+        '''
+        # 113 = Q, 101 = e, YES I KNOW I'M IN A HURRY OK
+        # Escape
+        pressed = state["pressed"]
+        button = state["button"]
+        
+        # Q
+        if button == pyglet.window.key.Q:
+            self._camera.ZoomIn(pressed)
+        # E
+        if button == pyglet.window.key.E:
+            self._camera.ZoomOut(pressed)
+        
+    def OnMouseButton(self, state):
+        if state["button"] % 2 == pyglet.window.mouse.LEFT:
+            self._lmb = state["pressed"] # True if pressed, False if not
+
 class Camera(object):
     '''
     classdocs
     '''
 
-    def __init__(self):
+    def __init__(self, window):
         '''
         Constructor
         '''
@@ -45,12 +83,8 @@ class Camera(object):
         self._prevtime = self._time
         self._zoomIn = False
         self._zoomOut = False
-        ' Events '
-        #self.__inputHandler = MouseHandler()
-        #self.__inputHandler.RegisterEvents()
-        #Events.RegisterEvent("CAMERA_ROTATE", self.Rotate)
-        #Events.RegisterEvent("CAMERA_ZOOM_IN", self.ZoomIn)
-        #Events.RegisterEvent("CAMERA_ZOOM_OUT", self.ZoomOut)
+        # Keyboard and mouse handler
+        self._controller = CameraController(self, window)
         # PREVIOUS MOUSE POSITIONS
         self.__oldscrx = 0
         self.__oldscry = 0
@@ -87,29 +121,6 @@ class Camera(object):
             self.__position = rotation.RotateVector(self.__position)
             self.__up = rotation.RotateVector(self.__up)
         # Done!
-        
-        '''
-        from math import cos
-        from math import sin
-        import numpy as np
-        import pdb
-        # Build rotation matrices
-        x = angles[0]
-        y = angles[1]
-        cx = cos(x)
-        cy = cos(y)
-        sx = sin(x)
-        sy = sin(y)
-        rx = np.matrix([[cx,-sx,0],[sx,cx,0],[0,0,1]])
-        ry = np.matrix([[cy,0,-sy],[0,1,0],[sy,0,cy]])
-        pos = np.matrix([self.__position[0],self.__position[1],self.__position[2]])
-        up = np.matrix([self.__up[0],self.__up[1],self.__up[2]])
-        newpos = ry*rx*pos.T
-        newup = ry*rx*up.T
-        self.__position = Vect3(newpos[0,0],newpos[1,0],newpos[2,0])
-        self.__up = Vect3(newup[0,0],newup[1,0],newup[2,0])
-        '''
-        self._RecalculatePosition()
             
     def Zoom(self, zoom=None):
         '''
@@ -138,15 +149,6 @@ class Camera(object):
         Zoom in camera
         '''
         self._zoomOut = on
-    
-    def _RecalculatePosition(self):
-        
-        #self.__position[0] = self.__zoom*math.cos(self.__xangle) * math.sin(self.__yangle)
-        #self.__position[1] = self.__zoom*math.sin(self.__xangle) * math.sin(self.__yangle)
-        #self.__position[2] = self.__zoom*math.cos(self.__yangle)
-        Events.Redraw()
-        # TODO; REMOVE THIS PLUMBING TO THE OLD EVENT HANDLER
-        #Events.FireEvent("REDRAW",0)
     
     def Draw(self):
         '''
@@ -195,6 +197,3 @@ class Camera(object):
         if self._zoomOut:
             self.__zoom *= zoomfact
             self.__position *= zoomfact
-        #print self.__zoom, dt
-        #if self._zoomIn or self._zoomOut:   
-        self._RecalculatePosition()

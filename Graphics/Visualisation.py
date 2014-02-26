@@ -8,7 +8,7 @@ import numpy
 import numpy as np
 import OpenGLStatics as Statics
 from Display import Display
-from Camera import Camera
+import Camera
 from Input import Input
 from MouseHandler import MouseHandler
 from KeyHandler import KeyHandler

@@ -28,7 +28,7 @@ SIZE = 1024
 WINSIZE = (SIZE,SIZE)
 WINX, WINY = WINSIZE
 
-from Graphics.Camera import Camera
+import Camera.Camera
 
 class TextSprite(object):
     '''
@@ -57,6 +57,8 @@ class Renderer(object):
         Constructor
         '''
         self._window = window
+        if camera == None:
+            camera = Camera.Camera(window)
         self._camera = camera
         # TODO: Replace redraw with an event? Better parallelism?
         self._redraw = True
@@ -136,6 +138,9 @@ class Renderer(object):
         Main display function
         '''
         
+        # TODO: GENERALISE THIS
+        if self._camera.ZoomActive():
+            self._redraw == True
         if self._redraw:
             # Clear background
             
