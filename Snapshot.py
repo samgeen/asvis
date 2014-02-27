@@ -17,48 +17,28 @@ class Snapshot(object):
     Handles the simulation data from a single snapshot and renders it
     '''
 
-    def __init__(self):
+    def __init__(self, filename):
         '''
         Constructor
         '''
-        self._cloud = None
-        self._filename = ""
         self._outnum = 0
         self._time = 0.0
-        self._snapdata = None
-        self._type = "stars"
         self._billboarding = False
-    
-    def ChangeType(self, newtype):
-        '''
-        Change the type of fluid to show
-        '''
-        if newtype != self._type and newtype in self._types:
-            self._type = newtype
-            self.Open(self._filename)
+        self._snapdata = None
+        self._filename = filename
         
-    def Open(self, filename):
+    def MakeCloud(self, fluidtype):
         '''
         Open a new snapshot
         '''
-        self._filename = filename
         # Read data from filename
-        #try:
-        points, sizes, pointmass = self._LoadNewData(filename)
-        #except:
-        #    print "Open failed; returning..."
-        #    return
+        points, sizes, pointmass = self._LoadNewData(fluidtype)
         # Make drawable point cloud object
-        if not self._cloud is None:
-            del self._cloud
         if self._billboarding:
-            self._cloud = BillboardDrawable(points,sizes,pointmass)
+            cloud = BillboardDrawable(points,sizes,pointmass)
         else:
-            self._cloud = SimpleDrawable(points,pointmass)
-        
-    def Draw(self, window):
-        if not self._cloud is None:
-            self._cloud.Draw(window)
+            cloud = SimpleDrawable(points,pointmass)
+        return cloud
             
     def InfoText(self):
         '''
@@ -68,22 +48,24 @@ class Snapshot(object):
         time = self._time
         return "Output: "+str(outnum)+"\nTime: "+str(time)
             
-    def _LoadNewData(self, filename):
+    def _LoadNewData(self, fluidtype):
         # Load data into pynbody
-        print "STARTED LOADING DATA ", filename
-        try:
-            ro=pynbody.load(filename)
-        except:
-            print "ABORTING LOADING (Opening snapshot failed - does this file exist?)"
-            return
-        if self._type == "stars":
+        print "STARTED LOADING DATA ", self._filename
+        ro = self._snapdata
+        if ro == None:
+            try:
+                ro=pynbody.load(self._filename)
+            except:
+                print "ABORTING LOADING (Opening snapshot failed - does this file exist?)"
+                return
+        if fluidtype == "stars":
             fluid = ro.stars
-        elif self._type == "gas":
+        elif fluidtype == "gas":
             fluid = ro.gas
-        elif self._type == "dm":
+        elif fluidtype == "dm":
             fluid = ro.dm
         else:
-            print "Fluid type",self._type," not recognised! Use stars, gas or dm."
+            print "Fluid type",fluidtype," not recognised! Use stars, gas or dm."
             raise TypeError
         posns = fluid["pos"]
         # No points?
@@ -91,14 +73,14 @@ class Snapshot(object):
             print "ABORTING LOADING (No stars)"
             return
         smooth = fluid["smooth"]
-        if not type == "gas":
+        if not fluidtype == "gas":
             mass = fluid["mass"]
         else:
             mass = fluid["mass"]*fluid["temp"] # Hacky! Mmm. Basically display thermal energy in an element?
-        if type == "dm":
+        if fluidtype == "dm":
             mass *= 0.1 # Artificially lower the brightness
         # Cut off background gas to save on rendering
-        if self._type == "gas":
+        if fluidtype == "gas":
             cutoff = 1e-3
             lim = mass > cutoff*np.max(mass)
             posns = posns[lim]
@@ -120,10 +102,7 @@ class Snapshot(object):
             cheap = fluid["pos"].units
             posns /= cheap
             smooth /= cheap
-        #posns /= ro._info["boxlen"]
-        #smooth /= ro._info["boxlen"]
         posns -= 0.5
-        #posns -= np.sum(posns,0)/len(posns)
         self._outnum = 0#self._FindOutNum(filename)
         self._time = 0.0#ro._info["time"]
         self._snapdata = ro

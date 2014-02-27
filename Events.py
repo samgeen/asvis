@@ -12,15 +12,16 @@ import pyglet
 
 
 class UserDispatcher(pyglet.event.EventDispatcher):
-    def redraw(self):
-        self.dispatch_event("on_redraw")
+    def doredraw(self):
+        #print "FlyPAPER"
+        self.dispatch_event("redraw")
         
-UserDispatcher.register_event_type("on_redraw")
+UserDispatcher.register_event_type("redraw")
 
 dispatcher = UserDispatcher()
 
 def Redraw():
-    dispatcher.redraw()
+    dispatcher.doredraw()
 
 class UserInputHandler(object):
     '''

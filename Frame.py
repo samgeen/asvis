@@ -34,14 +34,6 @@ class AbstractFrame(object):
         return self._window
     
     @abc.abstractmethod
-    def Setup(self):
-        '''
-        Setup the level
-        ABSTRACT METHOD; MUST BE ADDED BY CONCRETE CLASS
-        '''
-        return
-    
-    @abc.abstractmethod
     def Draw(self):
         '''
         Draw the level
@@ -86,10 +78,10 @@ class Frame(AbstractFrame):
         '''
         Constructor
         '''
-        Frame.Frame.__init__(self)
+        AbstractFrame.__init__(self, window)
         self._drawables = []
-        self._setup = False
         self._renderer = Renderer.Renderer(self.Window(), camera)
+        self._renderer.Redraw()
     
     def Add(self, drawable):
         '''
@@ -104,43 +96,4 @@ class Frame(AbstractFrame):
         self._drawables.remove(drawable)
     
     def Draw(self, dummy=None):
-        if not self._setup:
-            self.Setup()
         self._renderer.Draw(self._drawables)
-        
-    def OnMouseMove(self, state):
-        '''
-        Parse mouse movement
-        '''
-        if self._lmb:
-            self._renderer.Camera().OnMouseMove(state)
-        self.Redraw()
-
-    def OnKeyboard(self, state):
-        '''
-        Register the pressing or releasing of a keyboard key
-        This can be overridden by the concrete class if desired, or left inactive
-        state - a dictionary of the mouse state:
-                   {"button": button, "mod": modifier keys used, "pressed":True or False}
-        '''
-        # 113 = Q, 101 = e, YES I KNOW I'M IN A HURRY OK
-        # Escape
-        pressed = state["pressed"]
-        button = state["button"]
-        #if button == pyglet.window.key.ESCAPE:
-            # Upon returning the window will now quit too
-        # Q
-        if button == pyglet.window.key.Q:
-            self._renderer.Camera().ZoomIn(pressed)
-        # E
-        if button == pyglet.window.key.E:
-            self._renderer.Camera().ZoomOut(pressed)
-            
-        # Switch render modes
-        # TODO: Unbreak this
-        #if button == pyglet.window.key.P and not pressed:
-        #    self._renderer.ToggleBillboarding()
-        
-    def OnMouseButton(self, state):
-        if state["button"] % 2 == pyglet.window.mouse.LEFT:
-            self._lmb = state["pressed"] # True if pressed, False if not

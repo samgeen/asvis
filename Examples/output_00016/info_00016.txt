@@ -1,0 +1,22 @@
+ncpu        =          1
+ndim        =          3
+levelmin    =          6
+levelmax    =         10
+ngridmax    =    1000000
+nstep_coarse=        150
+
+boxlen      =  0.600000000000000E+02
+time        =  0.488215866833067E+01
+aexp        =  0.100000000000000E+01
+H0          =  0.100000000000000E+01
+omega_m     =  0.100000000000000E+01
+omega_l     =  0.000000000000000E+00
+omega_k     =  0.000000000000000E+00
+omega_b     =  0.000000000000000E+00
+unit_l      =  0.154265520169356E+23
+unit_d      =  0.412501015839815E-24
+unit_t      =  0.602871247665507E+16
+
+ordering type=hilbert                                                                         
+   DOMAIN   ind_min                 ind_max
+       1   0.000000000000000E+00   0.858993459200000E+10

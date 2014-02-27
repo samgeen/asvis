@@ -15,12 +15,9 @@ import pyglet
 from pyglet.gl import *
 from pyglet.gl.glu import *
 
+import Events
 
-from Graphics.ColourShader import ColourShader
-#import Render.OpenGLStatics
-#from Render.Window import Window
-#from Viewport import Viewport
-#from Stopwatch import Stopwatch
+#from Graphics.ColourShader import ColourShader
 
 #import EventHandler as Events
 
@@ -28,7 +25,7 @@ SIZE = 1024
 WINSIZE = (SIZE,SIZE)
 WINX, WINY = WINSIZE
 
-import Camera.Camera
+import Camera
 
 class TextSprite(object):
     '''
@@ -62,8 +59,9 @@ class Renderer(object):
         self._camera = camera
         # TODO: Replace redraw with an event? Better parallelism?
         self._redraw = True
-        self._modifiers = [ColourShader()]
+        self._modifiers = []#[ColourShader()]
         
+        Events.dispatcher.push_handlers(redraw=self.Redraw)
        
         pyglet.resource.path = ['data']
         pyglet.resource.reindex()
@@ -140,7 +138,8 @@ class Renderer(object):
         
         # TODO: GENERALISE THIS
         if self._camera.ZoomActive():
-            self._redraw == True
+            self._redraw = True
+        #print "REDRAW:", self._redraw
         if self._redraw:
             # Clear background
             
@@ -149,7 +148,7 @@ class Renderer(object):
             
             self.DrawBackground()
          
-            self.DrawScene(objects, "R") 
+            #self.DrawScene(objects, "R") 
             self.DrawScene(objects, "L") 
                 
             self.DrawGUI()
@@ -182,7 +181,7 @@ class Renderer(object):
         #glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         # TODO: REMOVE THIS HACK AND REPLACE WITH PROPER SHADERS
         glColor4f(1.0,1.0,1.0,1.0)
-        glPointSize(3.0)
+        glPointSize(1.0)
         
         # Set up modifier
         for mod in self._modifiers:
@@ -213,7 +212,7 @@ class Renderer(object):
         wx,wy = self._window.get_size()
         self._SetupView("2D")
         # Log label
-        self._loglabel.draw()
+        #self._loglabel.draw()
         
     def LogText(self, newtext):
         self._loglabel.text = newtext
@@ -238,7 +237,8 @@ class Renderer(object):
             # Set up viewport to position view in centre of screen
             glViewport(ox, oy, WINX, WINY)
             self._camera.Draw()
-            self._modifiers[0].ViewPos(ox, oy)
+            if len(self._modifiers) > 0:
+                self._modifiers[0].ViewPos(ox, oy)
         if type == "3DR":
             ox = wx - WINX
             oy = 0
@@ -246,9 +246,10 @@ class Renderer(object):
             # Set up viewport to position view in centre of screen
             glViewport(0, oy, WINX, WINY)
             self._camera.Draw()
-            self._modifiers[0].ViewPos(ox, oy)
+            if len(self._modifiers) > 0:
+                self._modifiers[0].ViewPos(ox, oy)
         
-    def Redraw(self, dummy=0):
+    def Redraw(self):
         '''
         Tell the display to redraw its contents the next time it gets a chance
         Dummy required to allow use as an event-driven function

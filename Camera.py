@@ -25,6 +25,7 @@ class CameraController(object):
     def __init__(self, camera, window):
         self._lmb = False
         self._camera = camera
+        self._window = window
         self._userInput = Events.UserInputHandler(self)
         self._window.push_handlers(self._userInput)
         
@@ -34,7 +35,6 @@ class CameraController(object):
         '''
         if self._lmb:
             self._camera.OnMouseMove(state)
-        Events.Redraw()
 
     def OnKeyboard(self, state):
         '''
@@ -43,7 +43,6 @@ class CameraController(object):
         state - a dictionary of the mouse state:
                    {"button": button, "mod": modifier keys used, "pressed":True or False}
         '''
-        # 113 = Q, 101 = e, YES I KNOW I'M IN A HURRY OK
         # Escape
         pressed = state["pressed"]
         button = state["button"]
@@ -121,6 +120,7 @@ class Camera(object):
             self.__position = rotation.RotateVector(self.__position)
             self.__up = rotation.RotateVector(self.__up)
         # Done!
+        Events.Redraw()
             
     def Zoom(self, zoom=None):
         '''
@@ -129,7 +129,6 @@ class Camera(object):
         if zoom:
             self.__position *= zoom / self.__zoom
             self.__zoom = zoom
-            self._RecalculatePosition()
         return self.__zoom
     
     def ZoomActive(self):
