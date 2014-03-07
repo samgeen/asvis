@@ -74,12 +74,26 @@ class Frame(AbstractFrame):
     The top level object for visualising astrophysics 
     '''
 
-    def __init__(self, window, camera=None):
+    def __init__(self, window, x, y, width, height, camera=None):
         '''
         Constructor
+        window - a pyglet window object
+        x , y - position of bottom left corner of Frame in the window
+        width, height - width and height of the frame
+        camera - a camera object (default: will create a camera object for you)
         '''
+        # Let's make these part of the interface why not
+        # I'm sure this won't bite me in the ass later </irony>
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
         AbstractFrame.__init__(self, window)
         self._drawables = []
+        self._window = window
+        if camera == None:
+            camera = Camera.Camera(window)
+        self._camera = camera
         self._renderer = Renderer.Renderer(self.Window(), camera)
         self._renderer.Redraw()
     
@@ -95,5 +109,23 @@ class Frame(AbstractFrame):
         '''
         self._drawables.remove(drawable)
     
+    def Camera(self, camera=None):
+        # Switch the camera?
+        if type(camera) != type(None):
+            self._camera = camera
+        # Return camera
+        return self._camera
+    
     def Draw(self, dummy=None):
-        self._renderer.Draw(self._drawables)
+        forceRedraw = False
+        self._SetupView()
+        if self._camera.ZoomActive():
+            forceRedraw = True
+        # HACK - ALWAYS REDRAW
+        # TODO: REMOVE THIS!!!
+        forceRedraw = True
+        self._renderer.Draw(self._drawables, forceRedraw)
+        
+    def _SetupView(self):
+        glViewport(self.x, self.y, self.width, self.height)
+        self._camera.Draw()

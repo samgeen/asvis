@@ -35,6 +35,8 @@ class CameraController(object):
         '''
         if self._lmb:
             self._camera.OnMouseMove(state)
+        else:
+            self._camera.ResetPos(state)
 
     def OnKeyboard(self, state):
         '''
@@ -87,6 +89,14 @@ class Camera(object):
         # PREVIOUS MOUSE POSITIONS
         self.__oldscrx = 0
         self.__oldscry = 0
+        
+    def ResetPos(self, state):
+        '''
+        Reset position when the user begins scrolling again
+        '''
+        x,y = state["pos"]
+        self.__oldscrx = x
+        self.__oldscry = y
         
     def OnMouseMove(self, state):
         '''

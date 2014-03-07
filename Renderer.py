@@ -53,10 +53,6 @@ class Renderer(object):
         '''
         Constructor
         '''
-        self._window = window
-        if camera == None:
-            camera = Camera.Camera(window)
-        self._camera = camera
         # TODO: Replace redraw with an event? Better parallelism?
         self._redraw = True
         self._modifiers = []#[ColourShader()]
@@ -124,51 +120,29 @@ class Renderer(object):
         # Hit it.
         print "Starting display"
     
-    def Camera(self, camera=None):
-        # Switch the camera?
-        if type(camera) != type(None):
-            self._camera = camera
-        # Return camera
-        return self._camera
-    
-    def Draw(self, objects=[]):
+    def Draw(self, objects=[], forceRedraw=False):
         '''
         Main display function
         '''
         
-        # TODO: GENERALISE THIS
-        if self._camera.ZoomActive():
-            self._redraw = True
         #print "REDRAW:", self._redraw
-        if self._redraw:
+        if self._redraw or forceRedraw:
             # Clear background
             
             #HACK - Clear disabled to test frame buffer
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             
-            self.DrawBackground()
          
             #self.DrawScene(objects, "R") 
-            self.DrawScene(objects, "L") 
-                
-            self.DrawGUI()
+            self.DrawScene(objects)
                 
             self._redraw = False
             
-    def DrawBackground(self):
-        '''
-        Draw the background
-        '''
-        self._SetupView("2D")
-        
-        #self._background.draw()
-            
-    def DrawScene(self, objects, side="L"):
+    def DrawScene(self, objects):
         '''
         Draw the 3D scene
         '''
         
-        self._SetupView("3D"+side)
+        #self._SetupView("3D"+side)
         
         # Set up face culling
         glDisable(GL_CULL_FACE)
@@ -196,7 +170,7 @@ class Renderer(object):
         glDisable(GL_DEPTH_TEST)
         for it in objects:
             if not it is None:
-                it.Draw(self._window)
+                it.Draw()
         #for it in self.__objects:
         #    it.Draw(self.__viewport)
         
@@ -207,15 +181,6 @@ class Renderer(object):
         # TOTAL HACK
         for mod in self._modifiers:
             mod.DrawTexture()
-            
-    def DrawGUI(self):
-        wx,wy = self._window.get_size()
-        self._SetupView("2D")
-        # Log label
-        #self._loglabel.draw()
-        
-    def LogText(self, newtext):
-        self._loglabel.text = newtext
         
     def _SetupView(self, type="2D"):
         wx,wy = self._window.get_size()

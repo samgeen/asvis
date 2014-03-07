@@ -19,15 +19,13 @@ class SimpleDrawable(object):
         self._masses = mass
         self._colours = None
         self._pointsGL = (GLfloat * len(flat))(*flat)
-        self._window = 0
         self._first = True
         
     # Draw the points to screen
-    def Draw(self, window):
+    def Draw(self):
         '''
         Draw object
         '''
-        self._window = window
         
         # First time through?
         # NOTE: I have no idea how reliable this code is at determining whether we set these things
@@ -53,7 +51,7 @@ class SimpleDrawable(object):
         
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glPointSize(2.0)
+        glPointSize(5.0)
         glDrawArrays(GL_POINTS, 0, len(self._pointsGL) // 3)
         #glBegin(GL_POINTS)
         #for it in self._points:

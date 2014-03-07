@@ -10,7 +10,7 @@ import pynbody
 import numpy as np
 #from Graphics.PointDrawable import PointDrawable
 from Graphics.SimpleDrawable import SimpleDrawable
-from Graphics.BillboardDrawable import BillboardDrawable
+#from Graphics.BillboardDrawable import BillboardDrawable
 
 class Snapshot(object):
     '''
@@ -80,12 +80,12 @@ class Snapshot(object):
         if fluidtype == "dm":
             mass *= 0.1 # Artificially lower the brightness
         # Cut off background gas to save on rendering
-        if fluidtype == "gas":
-            cutoff = 1e-3
-            lim = mass > cutoff*np.max(mass)
-            posns = posns[lim]
-            smooth = smooth[lim]
-            mass = mass[lim]
+        #if fluidtype == "gas":
+        #    cutoff = 1e-3
+        #    lim = mass > cutoff*np.max(mass)
+        #    posns = posns[lim]
+        #    smooth = smooth[lim]
+        #    mass = mass[lim]
         # Process lengths to fit screen
         rescalepoints = True
         if rescalepoints:
