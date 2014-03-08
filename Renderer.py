@@ -120,13 +120,13 @@ class Renderer(object):
         # Hit it.
         print "Starting display"
     
-    def Draw(self, objects=[], forceRedraw=False):
+    def Draw(self, objects=[]):
         '''
         Main display function
         '''
         
         #print "REDRAW:", self._redraw
-        if self._redraw or forceRedraw:
+        if self._redraw:
             # Clear background
             
             #HACK - Clear disabled to test frame buffer
@@ -150,20 +150,10 @@ class Renderer(object):
         # Set up the depth buffer
         glDisable(GL_DEPTH_TEST)
         
-        # Set up blend functions for this run (TODO: Pass to object draw code / shaders)
-        #glEnable(GL_BLEND)
-        #glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        # TODO: REMOVE THIS HACK AND REPLACE WITH PROPER SHADERS
-        glColor4f(1.0,1.0,1.0,1.0)
-        glPointSize(1.0)
+        # Set up blend functions for this run
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         
-        # Set up modifier
-        for mod in self._modifiers:
-            mod.Init(self)
-        
-        # Begin modifier
-        for mod in self._modifiers:
-            mod.Begin(self)
                 
         # Draw each object, passing them the camera in case they need it
         # TODO: Add scene graph object to deal with this?
@@ -171,16 +161,7 @@ class Renderer(object):
         for it in objects:
             if not it is None:
                 it.Draw()
-        #for it in self.__objects:
-        #    it.Draw(self.__viewport)
         
-        # Run modifier end actions
-        for mod in self._modifiers:
-            mod.End(self)
-        
-        # TOTAL HACK
-        for mod in self._modifiers:
-            mod.DrawTexture()
         
     def _SetupView(self, type="2D"):
         wx,wy = self._window.get_size()
@@ -220,6 +201,13 @@ class Renderer(object):
         Dummy required to allow use as an event-driven function
         '''
         self._redraw = True
+        
+    def ToRedraw(self):
+        '''
+        Do we have to redraw?
+        TODO: Rethink the wording of this interface
+        '''
+        return self._redraw
         
     def Window(self):
         '''

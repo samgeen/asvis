@@ -26,14 +26,20 @@ snap = asvis.Snapshot("spiral68_010")
 stars = snap.MakeCloud("stars")
 
 # Make frame in window
-frames = list()
-for i in range(0,5):
-    size = random.randint(100,500)
-    x = random.randint(0,window.width-size)
-    y = random.randint(0,window.height-size)
-    frame = asvis.Frame(window, x, y, size, size)
+randFrames = True
+if randFrames:
+    frames = list()
+    for i in range(0,5):
+        size = random.randint(100,500)
+        x = random.randint(0,window.width-size)
+        y = random.randint(0,window.height-size)
+        frame = asvis.Frame(window, x, y, size, size)
+        frame.Add(stars)
+        frames.append(frame)
+else:
+    frame = asvis.Frame(window, 200,200,512,512)
     frame.Add(stars)
-    frames.append(frame)
+    frames = [frame]
 
 glClearColor(0.0, 0.0, 0.0, 1.0)
 

@@ -14,6 +14,8 @@ import pyglet.window.key as key
 import Camera
 import Renderer
             
+from asvis.Graphics.FrameBuffer import FrameBuffer
+         
 class AbstractFrame(object):
     '''
     A frame/sub-window containing a 3D scene
@@ -95,6 +97,7 @@ class Frame(AbstractFrame):
             camera = Camera.Camera(window)
         self._camera = camera
         self._renderer = Renderer.Renderer(self.Window(), camera)
+        self._buffer = FrameBuffer(width, height)
         self._renderer.Redraw()
     
     def Add(self, drawable):
@@ -117,14 +120,19 @@ class Frame(AbstractFrame):
         return self._camera
     
     def Draw(self, dummy=None):
-        forceRedraw = False
         self._SetupView()
+        # HACK - Always redraw as fast as you can if the zoom is active
         if self._camera.ZoomActive():
-            forceRedraw = True
-        # HACK - ALWAYS REDRAW
-        # TODO: REMOVE THIS!!!
-        forceRedraw = True
-        self._renderer.Draw(self._drawables, forceRedraw)
+            self._renderer.Redraw()
+        
+        if self._renderer.ToRedraw():
+            self._buffer.Begin()
+            self._renderer.Draw(self._drawables)
+            self._buffer.End()
+            # TODO: Unfuck view setup routine; currently runs twice for no reason (see above)
+        self._SetupView()
+        
+        self._buffer.DrawTexture()
         # Reset view
         self._SetupView(reset=True)
         
@@ -147,9 +155,9 @@ class Frame(AbstractFrame):
     def _SetupView(self,reset=False):
         if not reset:
             glViewport(self.x, self.y, self.width, self.height)
-            self._DrawBorder()
             self._camera.Draw()
         else:
+            self._DrawBorder()
             wx = self._window.width
             wy = self._window.height
             glViewport(0,0,wx,wy)
