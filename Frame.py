@@ -124,7 +124,7 @@ class Frame(AbstractFrame):
         # HACK - Always redraw as fast as you can if the zoom is active
         if self._camera.ZoomActive():
             self._renderer.Redraw()
-        
+            
         if self._renderer.ToRedraw():
             self._buffer.Begin()
             self._renderer.Draw(self._drawables)
@@ -137,19 +137,23 @@ class Frame(AbstractFrame):
         self._SetupView(reset=True)
         
     def _DrawBorder(self):
-        glDisable(GL_DEPTH_TEST)
         glLoadIdentity()
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        glOrtho(0,1,0,1,-1,1)
+        glOrtho(0.,1.,0.,1.,-1,1)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
+        glDisable(GL_DEPTH_TEST)
         glBegin(GL_LINE_LOOP)
-        glVertex3f(0,0,0)
-        glVertex3f(0,1,0)
-        glVertex3f(1,1,0)
-        glVertex3f(1,0,0)
-        glVertex3f(0,0,0)
+        # Add small offset to catch cases where the graphics card won't draw objects right on the projection limits
+        err = 1e-4
+        d = 0.+err
+        u = 1.-err
+        glVertex3f(d,d,0)
+        glVertex3f(u,d,0)
+        glVertex3f(u,u,0)
+        glVertex3f(d,u,0)
+        glVertex3f(d,d,0)
         glEnd()
         
     def _SetupView(self,reset=False):

@@ -30,9 +30,10 @@ randFrames = True
 if randFrames:
     frames = list()
     for i in range(0,5):
-        size = random.randint(100,500)
+        size = random.randint(100,800)
         x = random.randint(0,window.width-size)
         y = random.randint(0,window.height-size)
+        print "Making frame of length", size, "at ("+str(x)+", "+str(y)+")"
         frame = asvis.Frame(window, x, y, size, size)
         frame.Add(stars)
         frames.append(frame)
