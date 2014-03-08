@@ -51,7 +51,7 @@ class SimpleDrawable(object):
         
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glPointSize(5.0)
+        glPointSize(1.0)
         glDrawArrays(GL_POINTS, 0, len(self._pointsGL) // 3)
         #glBegin(GL_POINTS)
         #for it in self._points:

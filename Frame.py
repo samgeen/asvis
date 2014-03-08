@@ -125,7 +125,38 @@ class Frame(AbstractFrame):
         # TODO: REMOVE THIS!!!
         forceRedraw = True
         self._renderer.Draw(self._drawables, forceRedraw)
+        # Reset view
+        self._SetupView(reset=True)
         
-    def _SetupView(self):
-        glViewport(self.x, self.y, self.width, self.height)
-        self._camera.Draw()
+    def _DrawBorder(self):
+        glDisable(GL_DEPTH_TEST)
+        glLoadIdentity()
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glOrtho(0,1,0,1,-1,1)
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        glBegin(GL_LINE_LOOP)
+        glVertex3f(0,0,0)
+        glVertex3f(0,1,0)
+        glVertex3f(1,1,0)
+        glVertex3f(1,0,0)
+        glVertex3f(0,0,0)
+        glEnd()
+        
+    def _SetupView(self,reset=False):
+        if not reset:
+            glViewport(self.x, self.y, self.width, self.height)
+            self._DrawBorder()
+            self._camera.Draw()
+        else:
+            wx = self._window.width
+            wy = self._window.height
+            glViewport(0,0,wx,wy)
+            glEnable(GL_DEPTH_TEST)
+            glMatrixMode(GL_PROJECTION)
+            glLoadIdentity()
+            glOrtho(0,wx,0,wy,-10,10)
+            glMatrixMode(GL_MODELVIEW)
+            glLoadIdentity()
+            #self._window.on_resize(wx,wy)
