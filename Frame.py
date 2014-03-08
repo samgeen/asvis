@@ -15,6 +15,7 @@ import Camera
 import Renderer
             
 from asvis.Graphics.FrameBuffer import FrameBuffer
+from asvis.Graphics.LogShader import LogShader
          
 class AbstractFrame(object):
     '''
@@ -97,7 +98,8 @@ class Frame(AbstractFrame):
             camera = Camera.Camera(window)
         self._camera = camera
         self._renderer = Renderer.Renderer(self.Window(), camera)
-        self._buffer = FrameBuffer(width, height)
+        logShader = LogShader()
+        self._buffer = FrameBuffer(width, height,logShader)
         self._renderer.Redraw()
     
     def Add(self, drawable):
@@ -137,6 +139,9 @@ class Frame(AbstractFrame):
         self._SetupView(reset=True)
         
     def _DrawBorder(self):
+        '''
+        Draw a border around the Frame
+        '''
         glLoadIdentity()
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()

@@ -17,17 +17,26 @@ class FrameBuffer(object):
     '''
 
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, shader=None):
         '''
         Constructor
+        width, height - width and height of buffer in pixels
+        shader - applies a shader to the output of the frame buffer
         '''
         self._width, self._height = (width, height)
+        self._shader = shader
         self._depth = 0#ctypes.c_int(0)
         self._frame = 0#ctypes.c_int(0)
         self._texture = 0#ctypes.c_int(0)
         self._image = 0
         self._prepared = False
         
+    def Texture(self):
+        '''
+        Return the frame buffer's OpenGL texture ID
+        '''
+        return self._texture
+    
     # Do this when the program is loaded
     def Init(self):
         
@@ -39,12 +48,14 @@ class FrameBuffer(object):
             glGenTextures(1,self._texture)
             #self._texture = pyglet.image.Texture.create(self._width, self._height, rectangle=True,internalformat=GL_RGBA32F_ARB)
             
+            
+            # I honestly don't know what half of this stuff is supposed to do
             glEnable( GL_TEXTURE_2D )
             glBindTexture( GL_TEXTURE_2D, self._texture )
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
 
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0)
@@ -82,13 +93,17 @@ class FrameBuffer(object):
             status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
             print "FRAME BUFFER STATUS:", status
             
+            if not self._shader is None:
+                self._shader.Init()
+            
             self._prepared = True
         
     # Do this before the objects are rendered
     def Begin(self):
         
-        # Re-bind frame buffer
-        self.Init()
+        if not self._prepared:
+            self.Init()
+        # Bind frame buffer
         glBindFramebuffer(GL_FRAMEBUFFER, self._frame)
         
         # Clear frame buffer
@@ -102,6 +117,9 @@ class FrameBuffer(object):
     def End(self):
         # Unbind frame buffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
+        # Inform the shader that the image has changed
+        if not self._shader is None:
+            self._shader.Reset()
     
     def DrawTexture(self):
         # Now we need to plot the texture to screen
@@ -121,6 +139,8 @@ class FrameBuffer(object):
         glEnable( GL_TEXTURE_2D )
         #glDisable(GL_TEXTURE_GEN_S)
         #glDisable(GL_TEXTURE_GEN_T)
+        if not self._shader is None:
+            self._shader.Begin()
         glBindTexture( GL_TEXTURE_2D, self._texture )
         glBegin(GL_TRIANGLES)
         glTexCoord2d(0.0,0.0);        glVertex3f(0.0, 0.0, 0.0);
@@ -132,5 +152,6 @@ class FrameBuffer(object):
         glTexCoord2d(0.0,0.0);        glVertex3f(0.0, 0.0, 0.0);
         glEnd()
         glBindTexture( GL_TEXTURE_2D, 0 )
-        
+        if not self._shader is None:
+            self._shader.End()
 

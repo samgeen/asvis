@@ -31,11 +31,10 @@ class SimpleDrawable(object):
         # NOTE: I have no idea how reliable this code is at determining whether we set these things
         if self._first:
             m = np.array([self._masses]).flatten()
-            m /= m.max()
             print len(m), m
             # HACK
-            #m *= 0.0
-            #m += 1.0
+            m *= 0.0
+            m += 1e-7
             # HACK END
             c = np.zeros((len(m),4))+1.0 #np.array([1.0,1.0,1.0,1.0])
             print c.shape
@@ -51,7 +50,7 @@ class SimpleDrawable(object):
         
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glPointSize(1.0)
+        glPointSize(3.0)
         glDrawArrays(GL_POINTS, 0, len(self._pointsGL) // 3)
         #glBegin(GL_POINTS)
         #for it in self._points:

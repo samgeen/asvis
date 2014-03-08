@@ -4,7 +4,7 @@ Created on Oct 23, 2012
 @author: samgeen
 '''
 
-import os.path
+import os, sys
 import collections
 
 '''
@@ -162,9 +162,10 @@ class Shader(object):
         if len(geom) == 0:
             geom = frag
         # Read shader files
-        fragname = "Graphics/Shaders/"+frag+".frag"
-        geomname = "Graphics/Shaders/"+geom+".geom"
-        vertname = "Graphics/Shaders/"+vert+".vert"
+        here = __file__[0:__file__.rfind(os.sep)] # TODO: Find solution to this that isn't dark magic
+        fragname = here+"/Shaders/"+frag+".frag"
+        geomname = here+"/Shaders/"+geom+".geom"
+        vertname = here+"/Shaders/"+vert+".vert"
         frag = self._ReadShader(fragname)
         vert = self._ReadShader(vertname)
         self._pshader = PygletShader(vert.split("/n"),frag.split("/n"))
