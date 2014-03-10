@@ -17,19 +17,31 @@ class FrameBuffer(object):
     '''
 
 
-    def __init__(self, width, height, shader=None):
+    def __init__(self, x, y, width, height, shader=None):
         '''
         Constructor
         width, height - width and height of buffer in pixels
         shader - applies a shader to the output of the frame buffer
         '''
+        self._pos = (x,y)
         self._width, self._height = (width, height)
+        self._texW = 0
+        self._texH = 0
         self._shader = shader
         self._depth = 0#ctypes.c_int(0)
         self._frame = 0#ctypes.c_int(0)
         self._texture = 0#ctypes.c_int(0)
         self._image = 0
         self._prepared = False
+        
+    def Pos(self):
+        return self._pos
+        
+    def Width(self):
+        return self._width
+    
+    def Height(self):
+        return self._height
         
     def Texture(self):
         '''
@@ -61,8 +73,12 @@ class FrameBuffer(object):
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0)
             glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0)
             glPixelStorei(GL_UNPACK_SKIP_ROWS, 0)
+            # Find the width of the texture in 2^N
+            self._texW = 2**int(np.log2(self._width)+1)
+            self._texH = 2**int(np.log2(self._height)+1)
             
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, self._width, self._height, 0,\
+            
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, self._texW, self._texH, 0,\
              GL_RGBA, GL_FLOAT, 0)
             #glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self._width, self._height, 0,\
             # GL_RGBA, GL_UNSIGNED_BYTE, 0)
@@ -94,7 +110,7 @@ class FrameBuffer(object):
             print "FRAME BUFFER STATUS:", status
             
             if not self._shader is None:
-                self._shader.Init()
+                self._shader.Init(self)
             
             self._prepared = True
         
@@ -143,12 +159,15 @@ class FrameBuffer(object):
             self._shader.Begin()
         glBindTexture( GL_TEXTURE_2D, self._texture )
         glBegin(GL_TRIANGLES)
+        # Scale texture coords to only show used part of texture
+        s = float(self._width)/float(self._texW)
+        t = float(self._height)/float(self._texH)
         glTexCoord2d(0.0,0.0);        glVertex3f(0.0, 0.0, 0.0);
-        glTexCoord2d(1.0,0.0);        glVertex3f(1.0, 0.0, 0.0);
-        glTexCoord2d(1.0,1.0);        glVertex3f(1.0, 1.0, 0.0);
+        glTexCoord2d(s,  0.0);        glVertex3f(1.0, 0.0, 0.0);
+        glTexCoord2d(s,  t  );        glVertex3f(1.0, 1.0, 0.0);
         
-        glTexCoord2d(1.0,1.0);        glVertex3f(1.0, 1.0, 0.0);
-        glTexCoord2d(0.0,1.0);        glVertex3f(0.0, 1.0, 0.0);
+        glTexCoord2d(s,  t  );        glVertex3f(1.0, 1.0, 0.0);
+        glTexCoord2d(0.0,t  );        glVertex3f(0.0, 1.0, 0.0);
         glTexCoord2d(0.0,0.0);        glVertex3f(0.0, 0.0, 0.0);
         glEnd()
         glBindTexture( GL_TEXTURE_2D, 0 )

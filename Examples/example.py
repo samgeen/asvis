@@ -29,7 +29,7 @@ stars = snap.MakeCloud("stars")
 randFrames = True
 if randFrames:
     frames = list()
-    for i in range(0,5):
+    for i in range(0,3):
         size = random.randint(100,800)
         x = random.randint(0,window.width-size)
         y = random.randint(0,window.height-size)
@@ -38,7 +38,7 @@ if randFrames:
         frame.Add(stars)
         frames.append(frame)
 else:
-    frame = asvis.Frame(window, 200,200,512,512)
+    frame = asvis.Frame(window, 200,200,600,600)
     frame.Add(stars)
     frames = [frame]
 

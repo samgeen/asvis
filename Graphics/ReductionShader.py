@@ -133,13 +133,15 @@ class ReductionShader(object):
         '''
         
         # enable the FBO     
+        # HACK - ASSUME THAT THE PROJECTION IS GOOD 
+        '''
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
+        '''
         
-        glDisable(GL_BLEND)
         glEnable(GL_TEXTURE_2D)
         
         shader.Bind()
@@ -159,8 +161,6 @@ class ReductionShader(object):
         # disable the FBO
         glBindFramebuffer(GL_FRAMEBUFFER,0)   
         shader.Unbind()
-        glDisable(GL_TEXTURE_2D)
-        glEnable(GL_BLEND)
         
         
         # TODO: DON'T JUST DO MAX VALUE

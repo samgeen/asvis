@@ -32,9 +32,11 @@ class SimpleDrawable(object):
         if self._first:
             m = np.array([self._masses]).flatten()
             print len(m), m
+            scale = 1e-7
+            m *= scale/np.max(m)
             # HACK
-            m *= 0.0
-            m += 1e-7
+            #m *= 0.0
+            #m += 1e-7
             # HACK END
             c = np.zeros((len(m),4))+1.0 #np.array([1.0,1.0,1.0,1.0])
             print c.shape

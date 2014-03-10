@@ -99,7 +99,7 @@ class Frame(AbstractFrame):
         self._camera = camera
         self._renderer = Renderer.Renderer(self.Window(), camera)
         logShader = LogShader()
-        self._buffer = FrameBuffer(width, height,logShader)
+        self._buffer = FrameBuffer(x,y,width, height,logShader)
         self._renderer.Redraw()
     
     def Add(self, drawable):
