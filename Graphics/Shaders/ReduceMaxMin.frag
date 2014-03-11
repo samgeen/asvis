@@ -1,5 +1,6 @@
 
 // Sample a texture and return the max of a square of values
+// NOTE - USES RED VALUE TO CALCULATE MAX AND GREEN VALUE TO CALCULATE MIN; BLUE/ALPHA ARE UNUSED
 uniform sampler2D    tex;
 uniform float        dt;
 
