@@ -11,7 +11,7 @@ from pyglet.gl import *
 import numpy as np
 
 import sys
-sys.path.append("/home/samgeen/Programming/MakeWee/workspace/")
+sys.path.append("../../")
 import asvis
 import random
 
