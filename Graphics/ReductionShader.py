@@ -155,8 +155,8 @@ class ReductionShader(object):
         size = int(self._length / math.pow(2,0))
         data = (c_float * 4)(0)
         glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, data)
-        #import pdb; pdb.set_trace()
-        output = np.array(data[0:2])
+        
+        output = np.array([data[0],data[3]])
         
         # disable the FBO
         glBindFramebuffer(GL_FRAMEBUFFER,0)   

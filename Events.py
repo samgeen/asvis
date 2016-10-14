@@ -13,7 +13,6 @@ import pyglet
 
 class UserDispatcher(pyglet.event.EventDispatcher):
     def doredraw(self):
-        #print "FlyPAPER"
         self.dispatch_event("redraw")
         
 UserDispatcher.register_event_type("redraw")

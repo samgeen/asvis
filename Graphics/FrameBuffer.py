@@ -17,17 +17,19 @@ class FrameBuffer(object):
     '''
 
 
-    def __init__(self, x, y, width, height, shader=None):
+    def __init__(self, x, y, width, height, postShader=None, preShader=None):
         '''
         Constructor
         width, height - width and height of buffer in pixels
-        shader - applies a shader to the output of the frame buffer
+        postShader - applies a shader to the output of the frame buffer
+        preShader - processes input fragments before they are put into the frame buffer
         '''
         self._pos = (x,y)
         self._width, self._height = (width, height)
         self._texW = 0
         self._texH = 0
-        self._shader = shader
+        self._postShader = postShader
+        self._preShader = preShader
         self._depth = 0#ctypes.c_int(0)
         self._frame = 0#ctypes.c_int(0)
         self._texture = 0#ctypes.c_int(0)
@@ -77,9 +79,13 @@ class FrameBuffer(object):
             self._texW = 2**int(np.log2(self._width)+1)
             self._texH = 2**int(np.log2(self._height)+1)
             
+            # On some systems this is needed to wipe the initial frame buffer rather than just setting the pointer to 0
+            empty = np.zeros((self._texW,self._texH,4))
+            c_float_p = ctypes.POINTER(ctypes.c_float)
+            empty_p = empty.ctypes.data_as(c_float_p)
             
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, self._texW, self._texH, 0,\
-             GL_RGBA, GL_FLOAT, 0)
+             GL_RGBA, GL_FLOAT, empty_p)
             #glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self._width, self._height, 0,\
             # GL_RGBA, GL_UNSIGNED_BYTE, 0)
             glBindTexture(GL_TEXTURE_2D, 0)
@@ -109,8 +115,12 @@ class FrameBuffer(object):
             status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
             print "FRAME BUFFER STATUS:", status
             
-            if not self._shader is None:
-                self._shader.Init(self)
+            # Set up the shaders
+            if not self._preShader is None:
+                self._preShader.Init(self)
+                
+            if not self._postShader is None:
+                self._postShader.Init(self)
             
             self._prepared = True
         
@@ -122,6 +132,10 @@ class FrameBuffer(object):
         # Bind frame buffer
         glBindFramebuffer(GL_FRAMEBUFFER, self._frame)
         
+        # Allow texture access to frame buffer
+        #glActiveTexture(GL_TEXTURE1)
+        #glBindTexture(GL_TEXTURE_2D,self._texture)
+        
         # Clear frame buffer
         glClearColor(0, 0, 0, 1)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -129,13 +143,22 @@ class FrameBuffer(object):
         glViewport(0,0,self._width, self._height)
         # At this point we draw the scene
         
+        if not self._preShader is None:
+            self._preShader.Begin()
+        
     # Do this after the objects are rendered
     def End(self):
         # Unbind frame buffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
+        if not self._preShader is None:
+            self._preShader.End()
+        # Clean up texture
+        #glActiveTexture(GL_TEXTURE1)
+        #glBindTexture(GL_TEXTURE_2D,0)
+        glActiveTexture(GL_TEXTURE0)
         # Inform the shader that the image has changed
-        if not self._shader is None:
-            self._shader.Reset()
+        if not self._postShader is None:
+            self._postShader.Reset()
     
     def DrawTexture(self):
         # Now we need to plot the texture to screen
@@ -155,8 +178,8 @@ class FrameBuffer(object):
         glEnable( GL_TEXTURE_2D )
         #glDisable(GL_TEXTURE_GEN_S)
         #glDisable(GL_TEXTURE_GEN_T)
-        if not self._shader is None:
-            self._shader.Begin()
+        if not self._postShader is None:
+            self._postShader.Begin()
         glBindTexture( GL_TEXTURE_2D, self._texture )
         glBegin(GL_TRIANGLES)
         # Scale texture coords to only show used part of texture
@@ -171,6 +194,6 @@ class FrameBuffer(object):
         glTexCoord2d(0.0,0.0);        glVertex3f(0.0, 0.0, 0.0);
         glEnd()
         glBindTexture( GL_TEXTURE_2D, 0 )
-        if not self._shader is None:
-            self._shader.End()
+        if not self._postShader is None:
+            self._postShader.End()
 

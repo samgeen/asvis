@@ -72,6 +72,10 @@ class PygletShader:
             # retrieve the log text
             glGetShaderInfoLog(shader, temp, None, buffer)
             # print the log to the console
+            if type == GL_FRAGMENT_SHADER:
+                print "(Fragment shader)"
+            if type == GL_VERTEX_SHADER:
+                print "(Vertex shader)"
             print buffer.value
         else:
             # all is well, so attach the shader to the program

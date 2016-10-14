@@ -20,12 +20,13 @@ class LogShader(object):
     '''
 
 
-    def __init__(self):
+    def __init__(self,shaderName="LogBuffer"):
         '''
         Constructor
         '''
-        self._incShader = 0
+        #self._incShader = 0
         self._logShader = 0
+        self._shaderName = shaderName
         self._recalcMaxMin = 0 # Counter to recalculate max/min
         self._logmin = -16.5 # = ln(1e-7)
         self._invlogrng = 0.1 # arbitrary guess
@@ -40,8 +41,8 @@ class LogShader(object):
         if not self._prepared:
             self._frameBuffer = frameBuffer
             # Set up shaders
-            self._incShader = Shader("IncrementBuffer")
-            self._logShader = Shader("LogBuffer")
+            #self._incShader = Shader("IncrementBuffer")
+            self._logShader = Shader(self._shaderName)
             size = max(self._frameBuffer.Width(), self._frameBuffer.Height())
             size = 2.0**int(np.log2(size)+1)
             self._reduction = ReductionShader(self._frameBuffer.Texture(), 

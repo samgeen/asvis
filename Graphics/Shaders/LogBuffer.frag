@@ -19,8 +19,7 @@ uniform float texinvrng;
 void main() 
 {
 	vec4 colour = texture2D(tex,gl_TexCoord[0].st);
-	//float intensity = log(DecodeFloatRGBA(colour)*1.718 + 1.0);
-	//float intensity = colour.r - 1.0/texinvrng + texmin + 1.0;
-	float intensity = (log(colour.r) - texmin) * texinvrng;
-	gl_FragColor = vec4(intensity,intensity,intensity,1.0);
+	//float intensity = (log(colour.r) - texmin) * texinvrng;
+	//gl_FragColor = vec4(intensity,intensity,intensity,1.0);
+	gl_FragColor = (log(colour) - texmin) * texinvrng;
 }

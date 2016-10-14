@@ -16,6 +16,10 @@ from pyglet.gl import *
 from pyglet.gl.glu import *
 
 import Events
+            
+from asvis.Graphics.FrameBuffer import FrameBuffer
+from asvis.Graphics.LogShader import LogShader
+from asvis.Graphics.SimplePhysShader import SimplePhysShader
 
 #from Graphics.ColourShader import ColourShader
 
@@ -49,7 +53,7 @@ class Renderer(object):
     '''
 
 
-    def __init__(self, window, camera):
+    def __init__(self, window, camera, frame):
         '''
         Constructor
         '''
@@ -72,6 +76,13 @@ class Renderer(object):
                           color=(255,255,255,200),
                           x=0, y=window.height,
                           anchor_x='left', anchor_y='top',multiline=True,width=1024)
+        
+        self._frame = frame
+        logShader = LogShader()
+        #simplePhysShader = SimplePhysShader()
+        self._buffer = FrameBuffer(frame.x,frame.y,
+                                   frame.width, frame.height,
+                                   logShader)#,simplePhysShader)
         
         
     def __del__(self):
@@ -127,6 +138,7 @@ class Renderer(object):
         
         #print "REDRAW:", self._redraw
         if self._redraw:
+            self._buffer.Begin()
             # Clear background
             
             #HACK - Clear disabled to test frame buffer
@@ -136,6 +148,9 @@ class Renderer(object):
             self.DrawScene(objects)
                 
             self._redraw = False
+            self._buffer.End()
+        
+        self._buffer.DrawTexture()
             
     def DrawScene(self, objects):
         '''
@@ -155,12 +170,12 @@ class Renderer(object):
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         
                 
-        # Draw each object, passing them the camera in case they need it
+        # Draw each object, passing them self in case they need it
         # TODO: Add scene graph object to deal with this?
         glDisable(GL_DEPTH_TEST)
         for it in objects:
             if not it is None:
-                it.Draw()
+                it.Draw(self)
         
         
     def _SetupView(self, type="2D"):
@@ -214,6 +229,12 @@ class Renderer(object):
         Return the display's window object
         '''
         return self._window
+    
+    def FrameBuffer(self):
+        '''
+        Return the current frame buffer
+        '''
+        return self._buffer
         
     def AddModifier(self, newModifier):
         '''

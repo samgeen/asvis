@@ -13,9 +13,6 @@ import pyglet.window.mouse as mouse
 import pyglet.window.key as key
 import Camera
 import Renderer
-            
-from asvis.Graphics.FrameBuffer import FrameBuffer
-from asvis.Graphics.LogShader import LogShader
          
 class AbstractFrame(object):
     '''
@@ -97,9 +94,7 @@ class Frame(AbstractFrame):
         if camera == None:
             camera = Camera.Camera(window)
         self._camera = camera
-        self._renderer = Renderer.Renderer(self.Window(), camera)
-        logShader = LogShader()
-        self._buffer = FrameBuffer(x,y,width, height,logShader)
+        self._renderer = Renderer.Renderer(self.Window(), camera,self)
         self._renderer.Redraw()
     
     def Add(self, drawable):
@@ -127,14 +122,14 @@ class Frame(AbstractFrame):
         if self._camera.ZoomActive():
             self._renderer.Redraw()
             
-        if self._renderer.ToRedraw():
-            self._buffer.Begin()
-            self._renderer.Draw(self._drawables)
-            self._buffer.End()
-            # TODO: Unfuck view setup routine; currently runs twice for no reason (see above)
-        self._SetupView()
+        # Redraw drawables?
+        for drawable in self._drawables:
+            if drawable.ToRedraw():
+                drawable.Redraw(False)
+                self._renderer.Redraw()
+        # Draw scene
+        self._renderer.Draw(self._drawables)
         
-        self._buffer.DrawTexture()
         # Reset view
         self._SetupView(reset=True)
         

@@ -69,7 +69,7 @@ class Camera(object):
         '''
         Constructor
         '''
-        zoomInit = 1.0
+        zoomInit = 2.0
         self.__zoom = zoomInit
         self.__lookAt = Vect3(0.0,0.0,0.0)
         self.__position = Vect3(0.0,0.0,zoomInit)
@@ -169,7 +169,7 @@ class Camera(object):
         self._CalcZoom(dt)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluPerspective(45,1.0,0.0001,10.0)
+        gluPerspective(45,1.0,0.01,10.0)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         gluLookAt(self.__position[0], self.__position[1], self.__position[2], 
